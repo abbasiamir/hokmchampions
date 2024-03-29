@@ -1,0 +1,15 @@
+﻿<label>حاکم:</label>&nbsp;<label>@hakem</label><br />
+<label>حکم:</label>&nbsp;<label>@hokm</label>
+
+<style>
+    label{
+        font-size:larger;
+        font-weight:bold;
+    }
+</style>
+@code {
+    [Parameter]
+    public string? hokm{ get; set; }
+    [Parameter]
+    public string? hakem{ get; set; }
+}

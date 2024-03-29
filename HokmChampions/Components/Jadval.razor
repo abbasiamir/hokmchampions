@@ -1,0 +1,420 @@
+﻿@using HokmChampions.Data.Entities
+@using HokmChampions.Services
+@using HokmChampions.Data
+@inherits OwningComponentBase<MatchesCrudService>
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+
+<div>
+    <table id="jadval" style="width:100%">
+        <tbody>
+            <tr>
+                <td><button style="border:none" @onclick="@(()=>goto_seri("prev"))">◄</button></td>
+                <td colspan="5"></td>
+                <td colspan="4">
+                    <center>
+                        <div class="row">
+
+                            <div class="col-4">
+                                <select class="form-control h-75 mt-2 col-4" @bind="ActiveSeriProperty">
+                                    <option class="text-center" value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                </select>
+                            </div>
+
+
+
+                            <div class="col-8">
+                                <span style="color:black;font-size:xx-large" class="d-inline-block">سری</span>
+                            </div>
+                        </div>
+                    </center>
+                </td>
+                <td colspan="5"></td>
+                <td><button style="border:none;float:right" @onclick="@(()=>goto_seri("next"))">►</button></td>
+            </tr>
+            <tr>
+                <td colspan="16" class="text-center"><h3 style=@styles[4][0]>@labels[4][0]</h3></td>
+            </tr>
+            <tr>
+                <td colspan="16"><center><img src="/Images/pipes/pipe-xlarg.png" /></center></td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td colspan=6><center><label style=@styles[3][0]>@labels[3][0]</label></center></td>
+                <td colspan=6><center><label style=@styles[3][1]>@labels[3][1]</label></center></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td colspan=2></td>
+                <td colspan=6><center><img src="/Images/pipes/pipes-larg.png" /></center></td>
+                <td colspan=6><center><img src="Images/pipes/pipes-larg.png" /></center></td>
+                <td colspan=2></td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td colspan=2><center><label style="align-content:center;color:@styles[2][0]">@labels[2][0]</label></center></td>
+                <td colspan="2"></td>
+                <td colspan=2><center><label style="float:left;color:@styles[2][1]">@labels[2][1]</label></center></td>
+
+                <td colspan=2><center><label style="float:right;color:@styles[2][2]">@labels[2][2]</label></center></td>
+                <td colspan="2"></td>
+                <td colspan=2><center><label style="align-content:center;color:@styles[2][3]">@labels[2][3]</label></center></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+
+                <td colspan=4><center><img src="/Images/pipes/pipe-medium.png" /></center></td>
+                <td colspan=4><center><img src="/Images/pipes/pipe-medium.png" /></center></td>
+                <td colspan=4><center><img src="/Images/pipes/pipe-medium.png" /></center></td>
+                <td colspan=4><center><img src="/Images/pipes/pipe-medium.png" /></center></td>
+
+            </tr>
+            <tr>
+                <td colspan="2"><center><label style=@styles[1][0]>@labels[1][0] </label></center></td>
+                <td colspan="2"><center><label style=@styles[1][1]>@labels[1][1] </label></center></td>
+                <td colspan="2"><center><label style=@styles[1][2]>@labels[1][2] </label></center></td>
+                <td colspan="2"><center><label style=@styles[1][3]>@labels[1][3] </label></center></td>
+                <td colspan="2"><center><label style=@styles[1][4]>@labels[1][4] </label></center></td>
+                <td colspan="2"><center><label style=@styles[1][5]> @labels[1][5]</label></center></td>
+                <td colspan="2"><center><label style=@styles[1][6]>@labels[1][6] </label></center></td>
+                <td colspan="2"><center><label style=@styles[1][7]> @labels[1][7]</label></center></td>
+            </tr>
+            <tr id="pipe1">
+                <td colspan="2"><center><img src="/Images/pipes/small-pipe.png" /></center></td>
+                <td colspan="2"><center><img src="/Images/pipes/small-pipe.png" /></center></td>
+                <td colspan="2"><center><img src="/Images/pipes/small-pipe.png" /></center></td>
+                <td colspan="2"><center><img src="/Images/pipes/small-pipe.png" /></center></td>
+                <td colspan="2"><center><img src="/Images/pipes/small-pipe.png" /></center></td>
+                <td colspan="2"><center><img src="/Images/pipes/small-pipe.png" /></center></td>
+                <td colspan="2"><center><img src="/Images/pipes/small-pipe.png" /></center></td>
+                <td colspan="2"><center><img src="/Images/pipes/small-pipe.png" /></center></td>
+            </tr>
+            <tr id="names">
+                <td><lable class="verticaltext float-start" style=@styles[0][0]>@labels[0][0]</lable></td>
+                <td><lable class="verticaltext float-end" style=@styles[0][1]>@labels[0][1]</lable></td>
+                <td><lable class="verticaltext" style=@styles[0][2]>@labels[0][2]</lable></td>
+                <td><lable class="verticaltext" style=@styles[0][3]>@labels[0][3]</lable></td>
+                <td><lable class="verticaltext" style=@styles[0][4]>@labels[0][4]</lable></td>
+                <td><lable class="verticaltext" style=@styles[0][5]>@labels[0][5]</lable></td>
+                <td><lable class="verticaltext" style=@styles[0][6]>@labels[0][6]</lable></td>
+                <td><lable class="verticaltext" style=@styles[0][7]>@labels[0][7]</lable></td>
+                <td><lable class="verticaltext" style=@styles[0][8]>@labels[0][8]</lable></td>
+                <td><lable class="verticaltext" style=@styles[0][9]> @labels[0][9]</lable></td>
+                <td><lable class="verticaltext" style=@styles[0][10]>@labels[0][10]</lable></td>
+                <td><lable class="verticaltext" style=@styles[0][11]>@labels[0][11]</lable></td>
+                <td><lable class="verticaltext" style=@styles[0][12]>@labels[0][12]</lable></td>
+                <td><lable class="verticaltext" style=@styles[0][13]>@labels[0][13]</lable></td>
+                <td><lable class="verticaltext" style=@styles[0][14]>@labels[0][14]</lable></td>
+                <td><lable class="verticaltext float-end" style=@styles[0][15]>@labels[0][15]</lable></td>
+            </tr>
+        </tbody>
+    </table>
+    <AuthorizeView>
+        <div style="text-align:center;width:100%"><a href="/game/@_username/@_matchid" target="_blank" class="btn btn-success w-25 "><b>بازی</b></a></div>
+    </AuthorizeView>
+</div>
+
+@code {
+    List<List<string>> labels = new List<List<string>>();
+    List<List<string>> styles = new List<List<string>>();
+    int ActiveSeri = 1;
+    string _username = "";
+    string _userid = "";
+    long _matchid = 0;
+    int _seri = 0;
+    bool _AddedToJadval = false;
+    public async Task GetUserName()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        _username = user.Identity.Name;
+        //await sessionStorage.SetItemAsync("username", username);
+        //infoes.username = username;
+        if (!string.IsNullOrEmpty(_username))
+        {
+            _userid = Service.GetUserId(_username);
+            //await sessionStorage.SetItemAsync("userid", userid);
+
+        }
+    }
+    public int ActiveSeriProperty
+    {
+        get
+        {
+            return ActiveSeri;
+        }
+        set
+        {
+            ActiveSeri = value;
+            setJadval(ActiveSeri);
+        }
+
+    }
+    async Task goto_seri(string s)
+    {
+        if (s == "prev")
+        {
+            ActiveSeri--;
+            if (ActiveSeri == 0)
+                ActiveSeri = 7;
+        }
+        else if (s == "next")
+        {
+            ActiveSeri++;
+            if (ActiveSeri == 8)
+                ActiveSeri = 1;
+        }
+        setJadval(ActiveSeri);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstrender)
+    {
+        //if (!await sessionStorage.ContainKeyAsync("AddedToJadval"))
+        //if (firstrender)
+        //{
+        //    await sessionStorage.SetItemAsync("AddedToJadval", false);
+        //    await sessionStorage.SetItemAsStringAsync("username", "");
+        //}
+        await initialize();
+    }
+    protected override void OnInitialized() => setJadval(ActiveSeri);
+
+
+
+    public async Task CheckHaveMatchAndAdd()
+    {
+        Match match = Service.GetMatch(_username);
+        if (match != null)
+        {
+            int playerno = 0;
+            if (_username == match.player1)
+            {
+                playerno = 1;
+            }
+            else
+                playerno = 2;
+            //await fillSessions(match.seri, match.round, match.matchNo, playerno, true, match.MatchId);
+            _matchid = match.MatchId;
+            _seri = match.seri;
+        }
+        else
+        {
+            match = Service.AddOrUpdateMatch(_username);
+            int playerno = 0;
+            if (_username == match.player1)
+                playerno = 1;
+            else
+                playerno = 2;
+            _matchid = match.MatchId;
+            _seri = match.seri;
+        }
+        _AddedToJadval = true;
+    }
+
+    public async Task initialize()
+    {
+        //await sessionStorage.GetItemAsync<string>("username");
+        if (string.IsNullOrEmpty(_username))
+            await GetUserName();
+        //username = await sessionStorage.GetItemAsync<string>("username");
+        //await sessionStorage.GetItemAsync<bool>("AddedToJadval");
+        if (!String.IsNullOrEmpty(_username) && !_AddedToJadval)
+        {
+            CheckHaveMatchAndAdd();
+            ActiveSeri = _seri; //await sessionStorage.GetItemAsync<int>("ActiveSeri");
+            setJadval(ActiveSeri);
+            StateHasChanged();
+        }
+
+    }
+    void setJadval(int ActiveSeri)
+    {
+        labels = new List<List<string>>();
+        styles = new List<List<string>>();
+        List<string> round1 = new List<string>();
+        List<string> round2 = new List<string>();
+        List<string> round3 = new List<string>();
+        List<string> round4 = new List<string>();
+        List<string> round5 = new List<string>();
+        List<string> styles1 = new List<string>();
+        List<string> styles2 = new List<string>();
+        List<string> styles3 = new List<string>();
+        List<string> styles4 = new List<string>();
+        List<string> styles5 = new List<string>();
+        for (int i = 0; i <= 30; i++)
+        {
+            if (i < 16)
+                styles1.Add("color:black");
+            if (i >= 16 && i < 24)
+                styles2.Add("color:black");
+            if (i >= 24 && i < 28)
+                styles3.Add("black");
+            if (i >= 28 && i < 30)
+                styles4.Add("color:black");
+            if (i == 30)
+                styles5.Add("color:black");
+        }
+        styles.Add(styles1);
+        styles.Add(styles2);
+        styles.Add(styles3);
+        styles.Add(styles4);
+        styles.Add(styles5);
+        List<Match> matches = Service.GetSeriMatches(ActiveSeri);
+        if (matches == null)
+        {
+            initialize();
+        }
+        if (matches != null)
+            for (int i = 0; i <= 30; i += 2)
+            {
+                if (i < 16)
+                {
+                    //select from Matches table
+                    Match m = matches.FirstOrDefault(x => x.round == 1 && x.matchNo == (i / 2) + 1);
+                    string text1 = "";
+                    string text2 = "";
+                    if (m != null)
+                    {
+                        text1 = m.player1;
+                        if (m.player2 != null)
+                            text2 = m.player2;
+                        else
+                            text2 = "بازیگر" + (i + 2).ToString();
+                    }
+                    else
+                    {
+                        text1 = "بازیگر" + (i + 1).ToString();
+                        text2 = "بازیگر" + (i + 2).ToString();
+                    }
+                    if (m != null && m.winner != null)
+                    {
+                        if (m.winner == m.player1)
+                        {
+                            styles[0][i] = "color:green";
+                            styles[0][i + 1] = "color:red";
+                        }
+                        else
+                        {
+                            styles[0][i] = "color:red";
+                            styles[0][i + 1] = "color:green";
+                        }
+                    }
+                    round1.Add(text1);
+                    round1.Add(text2);
+                    if (i == 14)
+                        labels.Add(round1);
+                }
+
+                if (i > 15 && i < 24)
+                {
+
+                    string text1 = "بازیگر برنده";
+                    string text2 = "بازیگر برنده";
+                    Match m = matches.FirstOrDefault(x => x.round == 2 && x.matchNo == ((i - 16) / 2) + 1);
+                    if (m != null)
+                    {
+                        text1 = m.player1;
+                        if (m.player2 != null)
+                            text2 = m.player2;
+                    }
+                    if (m != null && m.winner != null)
+                    {
+                        if (m.winner == m.player1)
+                        {
+                            styles[1][i - 16] = "color:green";
+                            styles[1][i + 15] = "color:red";
+                        }
+                        else
+                        {
+                            styles[1][i - 16] = "color:red";
+                            styles[1][i - 15] = "color:green";
+                        }
+                    }
+                    round2.Add(text1);
+                    round2.Add(text2);
+                    if (i == 22)
+                        labels.Add(round2);
+                }
+
+                if (i >= 24 && i < 28)
+                {
+
+                    string text1 = "بازیگر برنده";
+                    string text2 = "بازیگر برنده";
+                    Match m = matches.FirstOrDefault(x => x.round == 3 && x.matchNo == ((i - 24) / 2) + 1);
+                    if (m != null)
+                    {
+                        text1 = m.player1;
+                        if (m.player2 != null)
+                            text2 = m.player2;
+                    }
+                    if (m != null && m.winner != null)
+                    {
+                        if (m.winner == m.player1)
+                        {
+                            styles[2][i - 24] = "green";
+                            styles[2][i - 23] = "red";
+                        }
+                        else
+                        {
+                            styles[2][i - 24] = "red";
+                            styles[2][i - 23] = "green";
+                        }
+                    }
+                    round3.Add(text1);
+                    round3.Add(text2);
+                    if (i == 26)
+                        labels.Add(round3);
+                }
+
+                if (i >= 28 && i < 30)
+                {
+
+                    string text1 = "بازیگر برنده";
+                    string text2 = "بازیگر برنده";
+                    Match m = matches.FirstOrDefault(x => x.round == 4 && x.matchNo == ((i - 28) / 2) + 1);
+                    if (m != null)
+                    {
+                        text1 = m.player1;
+                        if (m.player2 != null)
+                            text2 = m.player2;
+                    }
+                    if (m != null && m.winner != null)
+                    {
+                        if (m.winner == m.player1)
+                        {
+                            styles[3][i - 28] = "color:green";
+                            styles[3][i - 27] = "color:red";
+                        }
+                        else
+                        {
+                            styles[3][i - 28] = "color:red";
+                            styles[3][i - 27] = "color:green";
+                        }
+                    }
+                    round4.Add(text1);
+                    round4.Add(text2);
+                    if (i == 28)
+                        labels.Add(round4);
+                }
+
+                if (i == 30)
+                {
+                    Match m = matches.FirstOrDefault(x => x.round == 5 && x.matchNo == 1);
+                    if (m != null && m.winner != null)
+                    {
+                        round5.Add(m.winner);
+                        styles[4][0] = "color:darkred";
+                    }
+                    else
+                        round5.Add("قهرمان");
+                    labels.Add(round5);
+                }
+
+            }
+    }
+}

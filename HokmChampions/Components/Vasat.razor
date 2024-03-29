@@ -1,0 +1,67 @@
+﻿@using HokmChampions.Services
+
+    <table id="vasattbl" width="369px" style="margin:0 auto;margin-top:-50px">
+        <tr>
+            <td style="width:193px">
+                <table>
+                    <tr><td></td></tr>
+                    <tr><td height="193px" width="153px" style="padding:20px;display:@vdisplay[1]"><img src="@vnames[1]" /></td></tr>
+                    <tr><td></td></tr>
+                </table>
+            </td>
+            <td width="193px">
+                <table>
+                    <tr><td  height="173px" width="153px" style="padding:20px;padding-top:0px;display:@vdisplay[0]"><img src="@vnames[0]" /></td></tr>
+                    <tr><td height="25px"></td></tr>
+                    <tr><td  height="173px" width="153px" style="padding:20px;padding-bottom:0px;display:@vdisplay[2]"><img src="@vnames[2]" /></td></tr>
+                </table>
+            </td>
+            <td width="193px">
+                <table>
+                    <tr><td></td></tr>
+                    <tr><td  height="193px" width="153px" style="padding:20px;display:@vdisplay[3]"><img src="@vnames[3]" /></td></tr>
+                    <tr><td></td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+
+@code {
+    [Parameter]
+    public Cardinstant[]? vasats{ get; set; }
+    [Parameter]
+    public int player{ get; set; }
+    public string[] vdisplay = new string[4] { "none", "none", "none", "none" };
+    public string[] vnames = new string[4] { "", "", "", "" };
+    int counter = 0;
+    protected override void OnInitialized(){
+        if (player == 2)
+        {
+            counter = 3;
+        }
+        else if (player == 1)
+        {
+            counter = 2;
+        }
+        Init();
+    }
+    public void Init()
+    {
+        foreach(Cardinstant card in vasats)
+        {
+
+            if (card == null)
+            {
+                vdisplay[counter] = "none";
+            }
+            else
+            {
+                vdisplay[counter] = "block";
+                vnames[counter] ="/Images/Cards/"+ card.name+".png";
+            }
+            if (counter++ == 4)
+                counter = 0;
+        }
+    }
+}

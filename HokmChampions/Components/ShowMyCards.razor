@@ -1,0 +1,85 @@
+﻿@using HokmChampions.Data.Entities
+@using HokmChampions.Services
+@inherits OwningComponentBase<MatchesCrudService>
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+<div id="cardcontainer" width="653px" style="margin-top:20px"  >
+    @for(int i=0;i<@cardcount;i++)
+    {
+        <div  style="display:inline-block;width:45px">
+           
+             <img src="@_imageNames[i]"   />
+        </div>
+    }
+</div>
+<style>
+   
+   #cardcontainer:last-child{
+       width:113px;
+   } 
+</style>
+@code
+{
+
+    
+    //[Parameter]
+    //public Match? _match{ get; set; }
+    //[Parameter]
+    //public int player{ get; set; }
+    [Parameter]
+     public List<Cardinstant>? _myCards{ get; set; } 
+
+    public int imgCounter = 0;
+    public int cardcount = 0;
+   // public List<Card> _myCards = new List<Card>();
+    public List<string> _imageNames = new List<string>();
+   // public string _username;
+    protected override void OnParametersSet()
+    {
+        //await GetUsername();
+        init();
+
+    }
+    public void init()
+    {
+        imgCounter = 0;
+        GetMyCards();
+        getImageNames();
+        StateHasChanged();
+        //await Task.Delay(1000);
+        //await init();
+    }
+    public void GetMyCards()
+    {
+        //Match _match = Service.GetMatch(_matchid);
+        //if (_match != null)
+        //{
+            //_player = await GetCookie<int>("player");
+            //_myCards = Service.GetMyCards(_match, _player);
+            if (_myCards.Count!=0)
+                cardcount = _myCards.Count;
+            else
+                cardcount = 0;
+        
+    }
+    public void getImageNames()
+    {
+        _imageNames = new List<string>();
+        if(_myCards.Count!=0)
+            foreach(Cardinstant card in _myCards)
+            {
+                //string cardname = CardsActions.getCardName(card);
+                _imageNames.Add("/Images/Cards/" + card.name + ".png");
+            }
+    }
+    //public async Task<T> GetCookie<T>(string name)
+    //{
+    //    return await localStorage.GetItemAsync<T>(name+_username);
+    //}
+    //public async Task GetUsername()
+    //{
+    //    var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+    //    var user = authstate.User;
+    //    _username= user.Identity.Name;
+    //}
+}

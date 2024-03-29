@@ -1,0 +1,25 @@
+﻿
+
+<div class="d-flex justify-content-between " style="width:100%" dir="rtl">
+    <div >
+        <AuthorizeView>
+            <Authorized>
+                <span class="whitea">سلام, @context.User.Identity?.Name!</span>
+                <form method="post" action="Identity/Account/LogOut" class="d-inline-block mt-0">
+                    <button type="submit" class="nav-link btn btn-link whitea" style="margin-top:-10px">خروج</button>
+                </form>
+            </Authorized>
+            <NotAuthorized>
+                <a class="whitea" href="Identity/Account/Register">ثبت نام</a>
+                <a class="whitea" href="Identity/Account/Login">ورود</a>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+    <div>
+        <a class="whitea" style="font-size:large" href="/">مسابقات حکم</a>
+    </div>
+    <div>
+        <a class="whitea" href="#">بازی یکنفره</a>
+    </div>
+</div>
+

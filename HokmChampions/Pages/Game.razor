@@ -1,0 +1,629 @@
+﻿@page "/game"
+@page "/game/{_username}/{matchid}"
+@using HokmChampions.Data
+@using HokmChampions.Data.Entities
+@using Microsoft.AspNetCore.SignalR.Client
+@using HokmChampions.Services
+@using HokmChampions.Components
+@inject NavigationManager navigationManager
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+@inject infoes inf
+
+@inherits OwningComponentBase<MatchesCrudService>
+<div>
+    <div class="row">
+        <div class="float-start d-inline-block w-25">
+            <HokmChampions.Components.HokmHakem hakem="@inf.hakem" hokm=@inf.hokm />
+            
+        </div>
+        <div class="w-75" style="display:@inf.Msgdisplay">
+        @*@if (inf.state == "Ready")
+        {*@
+            <h2  class="float-end">@inf.dots @inf.Msg  </h2>
+        
+        </div>
+    </div>
+    <div style="height:390px;display:block">
+        <Vasat vasats="@inf.vasat" player="@inf.player"/>
+    </div>
+    @if ((inf.player == 1 && inf.state == "readyTohokm"&&inf.hakemnumber==2) || (inf.player == 2 && inf.state == "hakemrecived"&&inf.hakemnumber==1))
+    {
+        <div class="row">
+            <button class="btn btn-primary w-25 mt-1 mb-1" style="margin:0 auto" @onclick="@(()=>onGetHokmInterval())">دریافت حکم</button>
+        </div>
+    }
+    @if(inf.state=="readcards")
+    {
+        <div class="row">
+            <button class="btn btn-primary w-25 mt-1 mb-1" style="margin:0 auto" @onclick="@(()=>getcards2())">دریافت کارت ها</button>
+        </div>
+    }
+    @if(inf.player!=0)
+    {     
+            <div style="width:653px;margin:0 auto">
+               <ShowMyCards   _myCards="@inf.playersCards[inf.player-1]"/>
+            </div>
+    }
+   <div><h2>@inf.state</h2></div>
+   
+</div>
+<div style="position:absolute;margin-top:-500px;z-index:100;display:@inf.Modaldisplay;text-align:center;width:100%">
+@*<div id="myModal" class="modal fade mt-5" role="dialog" style="z-index:100">*@
+  <div class="modal-dialog "  >
+
+    <!-- Modal content-->
+    <div class="modal-content" >
+      <div class="modal-header"  >
+       @* <button type="button" class="close" data-dismiss="modal">&times;</button>*@
+        <h5 class="modal-title " style="margin:0 auto">لطفا حکم کنید</h5>
+      </div>
+      <div class="modal-body d-flex justify-content-around">
+       <div class="d-inline-block lm-2"><img src="/Images/logos/اسپیک.bmp" @onclick="@(()=>@modalHokmKon(1))"/></div>
+       <div class="d-inline-block lm-2"><img src="/Images/logos/دل1.bmp" @onclick="@(()=>@modalHokmKon(2))" /></div>
+       <div class="d-inline-block lm-2"><img src="/Images/logos/گیشنیز.bmp" @onclick="@(()=>@modalHokmKon(3))" /></div>
+       <div class="d-inline-block lm-2 rm-2"><img src="/Images/logos/خشت.bmp" @onclick="@(()=>@modalHokmKon(4))" /></div>
+       
+     </div>
+     @* <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>*@
+   </div>
+
+  </div>
+@*</div>*@
+</div>
+@code {
+
+    [Parameter]
+    public string _username { get; set; }
+    [Parameter]
+    public string matchid { get; set; }
+    //static string Modaldisplay = "none";
+    string msgDisplay = "inline-block";
+    string dots = "";
+    string Message = "";
+    //string _hakem = "";
+    //int _hakemnumber = 0;
+    //string _hokm ="";
+    //int _hokmnumber = 0;
+    //string state = "";
+
+    //long _matchid = 0;
+    //string _userid = "";
+    //string _harifname = "";
+    //string _harifid = "";
+    //static int _player = 0;
+    //Match _match;
+    //bool _recived = false;
+    //static List<string> swapCards=new List<string>();
+    //List<List<Cardinstant>> playersCards = new List<List<Cardinstant>>()
+    //{
+    //    new List<Cardinstant>(),
+    //    new List<Cardinstant>(),
+    //    new List<Cardinstant>(),
+    //    new List<Cardinstant>()
+    //}; 
+
+    //public async Task SetCookie<T>(string name,T value)
+    //{
+    //    await localStorage.SetItemAsync<T>(name+_username, value);
+    //}
+    //public async Task<T> GetCookie<T>(string name)
+    //{
+    //    return await localStorage.GetItemAsync<T>(name+_username);
+    //}
+    public void getcards2()
+    {
+        GetCards();
+        inf.state = "readcard2";
+    }
+    public async  Task onReadyInterval()
+    {
+
+        if (inf.state == "Ready")
+        {
+            inf.dots += ".";
+            if (inf.dots == ".....")
+                inf.dots = "";
+            StateHasChanged();
+            if( Getharif())
+                await send();
+            await Task.Delay(1000);
+
+            await onReadyInterval();
+        }
+
+    }
+    public async  Task onGetHokmInterval()
+    {
+        if (inf.player == 1 && inf.swapCards.Count == 32)
+        {
+            await dist(13, inf.match);
+            GetCards(5);
+        }
+        if (inf.hokmnumber==0)
+        {
+            inf.dots += ".";
+            if (inf.dots == ".....")
+                inf.dots = "";
+            StateHasChanged();
+
+            await Task.Delay(1000);
+
+            await onGetHokmInterval();
+        }
+        else
+        {
+            if (inf.player == 2)
+                inf.state = "readcard2";
+            inf.Msgdisplay = "none";
+            await dist13();
+            GetCards();
+        }
+        StateHasChanged();
+    }
+    public async Task Setinfos()
+    {
+        inf.MatchId = Convert.ToInt64(matchid);
+        inf.username = _username;
+        inf.Modaldisplay = "none";
+        inf.match = Service.GetMatch(inf.MatchId);
+        if (inf.username == inf.match.player1)
+            inf.player = 1;
+        else if(inf.username==inf.match.player2)
+            inf.player = 2;
+
+        if(string.IsNullOrEmpty(inf.state))
+            inf.state= "Ready";
+
+    }
+    public bool Getharif()
+    {
+
+
+        inf.userid = Service.GetUserId(inf.username);
+
+
+        if (inf.player == 1)
+        {
+            if (inf.match.player2 == null)
+                return false;
+            inf.harifname = inf.match.player2;
+
+        }
+        else if(inf.player==2)
+        {
+            if (inf.match.player1 == null)
+                return false;
+            inf.harifname = inf.match.player1;
+
+        }
+        inf.harifid = Service.GetUserId(inf.harifname);
+
+        return true;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(string.IsNullOrEmpty(inf.state))
+            await start();
+    }
+
+    public async Task RemovAndDist5()
+    {
+        if (inf.player == 1)
+        {
+            Service.RemoveMatchCards(inf.MatchId);
+            await dist(5, inf.match);
+
+        }
+
+    }
+    public async Task start()
+    {
+
+
+        await Task.Delay(1);
+
+        string baseUrl = navigationManager.BaseUri;
+
+        inf._hubUrl = baseUrl + "MyHub";
+
+
+        inf._hubConnection = new HubConnectionBuilder()
+               .WithUrl(inf._hubUrl)
+               .Build();
+        inf._hubConnection.On<string, string, List<string>>("Broadcast", BroadcastMassage);
+        await inf._hubConnection.StartAsync();
+        await Setinfos();
+        await RemovAndDist5();
+        inf.Msg = "حریف شما هنوز آماده نیست لطفا صبر کنید";
+        inf.Msgdisplay = "inline-block";
+        await onReadyInterval();
+        //await send();
+    }
+    public async Task send()
+    {
+
+        if (inf.state == "Ready")
+        {
+            if (!String.IsNullOrEmpty(inf.harifname))
+            {
+                //if(await GetCookie<int>("player")==2)
+                //    await SetCookie<string>("state", "hakem");
+                await SendAsync(inf.harifname, "Ready",null);
+
+
+            }
+        }
+        if (inf.state == "ReadyRecived")
+        {
+            await SendAsync(inf.harifname, "ReadyRecived", null);
+
+            GetCards(5);
+            StateHasChanged();
+
+
+        }
+        if (inf.state == "sethakem")
+        {
+            List<string> hakemnum = new List<string>();
+            hakemnum.Add(inf.hakemnumber.ToString());
+            await SendAsync(inf.harifname, "hakem", hakemnum);
+
+        }
+        if (inf.state == "hakemrecived")
+        {
+            //await SetCookie<string>("state", "readhokm");
+            await SendAsync(inf.harifname, "hakemrecived", null);
+           // StateHasChanged();
+        }
+        if (inf.state == "readyTohokm")
+        {
+            await SendAsync(inf.harifname, "readyTohokm", null);
+        }
+
+        if (inf.state == "sendhokm")
+        {
+
+            List<string> hokmnum = new List<string>();
+            hokmnum.Add(inf.hokmnumber.ToString());
+            await SendAsync(inf.harifname, "hokm2", hokmnum);
+            await dist13();
+            GetCards();
+            StateHasChanged();
+        }
+        if (inf.state == "sendhokm2")
+        {
+            List<string> hokmnum = new List<string>();
+            hokmnum.Add(inf.hokmnumber.ToString());
+            await SendAsync(inf.harifname, "hokm1", hokmnum);
+            GetCards();
+            StateHasChanged();
+        }
+
+    }
+    public void GetCards()
+    {
+        for(int i = 0; i < 4; i++)
+        {
+            inf.playersCards[i]=CardsActions.Card2instant(Service.GetMyCards(inf.match, i+1));
+        }
+    }
+    public void GetCards(int count)
+    {
+        for(int i = 0; i < 4; i++)
+        {
+            inf.playersCards[i]=CardsActions.Card2instant(Service.GetMyCards(inf.match, i+1,count));
+        }
+    }
+    async Task sethakem()
+    {
+        Random r = new Random();
+        inf.hakemnumber =  r.Next(1, 5);
+
+    }
+    public void sethakemName()
+    {
+
+        switch (inf.hakemnumber)
+        {
+            case 1:
+                {
+                    if (inf.player == 1)
+                        inf.hakem = "شما";
+                    else
+                        inf.hakem = inf.harifname;
+                    break;
+                }
+            case 2:
+                {
+                    if (inf.player == 1)
+                        inf.hakem =inf.harifname;
+                    else
+                        inf.hakem = "شما";
+                    break;
+                }
+            case 3:
+                {
+                    inf.hakem = "بازیگر 3";
+                    break;
+                }
+            case 4:
+                {
+                    inf.hakem = "بازیگر 4";
+                    break;
+                }
+        }
+
+    }
+    public async Task BroadcastMassage(string username, string key, List<string> content)
+    {
+        if (inf.username == username)
+        {
+
+            if (key == "Ready")
+
+            {
+
+                inf.Msgdisplay = "none";
+
+                if(!inf.readyrecived)
+                {
+                    inf.readyrecived = true;
+                    inf.state="Ready";
+                    await send();
+
+
+                }
+                else
+                {
+                    inf.state="ReadyRecived";
+                    await send();
+                }
+            }
+            if(key=="ReadyRecived")
+            {
+                inf.readyrecived = true;
+                if (inf.player==1)
+                {
+
+                    inf.state= "sethakem";
+                    await sethakem();
+                    sethakemName();
+                    await send();
+
+
+                }
+                else if (inf.player==2)
+                {
+
+                    inf.state = "ReadyRecived";
+                    await send();
+                    inf.state= "hakem";
+                }
+
+
+            }
+            if (key == "hakem")
+            {
+                inf.hakemnumber = Convert.ToInt32(content[0]);
+                sethakemName();
+
+                inf.state="hakemrecived";
+                await send();
+               
+                if (inf.hakemnumber == 1)
+                {
+                    inf.Msg = "حریف در حال حکم کردن است";
+                    inf.Msgdisplay = "inline-block";
+                    await onGetHokmInterval();
+                }
+                 StateHasChanged();
+            }
+            if (key == "hakemrecived")
+            {
+
+                if(inf.hakemnumber==2)
+                {
+                    inf.state= "readyTohokm";
+                    await send();
+                    inf.Msg = "حریف در حال حکم کردن است";
+                    inf.Msgdisplay = "inline-block";
+                    await onGetHokmInterval();
+                }
+                else
+                {
+                    await HokmKon(inf.hakemnumber);
+
+                }
+            }
+            if (key == "readyTohokm")
+            {
+
+                if(inf.hakemnumber==2)
+                {
+                    await HokmKon(2);
+
+                }
+
+
+            }
+            if (key == "hokm2")
+            {
+
+                inf.hokmnumber = Convert.ToInt32(content[0]);
+                inf.hokm = CardsActions.GetCardTypeName(inf.hokmnumber);
+                GetCards();
+                if(inf.playersCards[1].Count<13)
+                    inf.state = "readcards";
+                else
+                {
+                    inf.state = "readcard1";
+                    StateHasChanged();
+                }
+
+
+
+            }
+            if (key == "hokm1")
+            {
+                inf.hokmnumber = Convert.ToInt32(content[0]);
+                inf.hokm = CardsActions.GetCardTypeName(inf.hokmnumber);
+                inf.state= "readcard1";
+                GetCards();
+                StateHasChanged();
+
+            }
+        }
+    }
+    public async Task HokmKon(int player)
+    {
+        if (inf.hakemnumber == 1 || inf.hakemnumber == 2)
+        {
+            inf.Modaldisplay = "inline-block";
+            StateHasChanged();
+        }
+
+        else
+        {
+            //await dist(13, inf.match);
+            GetCards(5);
+            inf.hokmnumber = hokmKonComp(inf.hakemnumber);
+            setHokmName(inf.hokmnumber);
+           // await dist13();
+            inf.state="sendhokm";
+            await send();
+            inf.state="readcard1";
+            
+        }
+    }
+    public int  hokmKonComp(int player)
+    {
+        int[] results = new int[4];
+        for(int i = 0; i < 5; i++)
+        {
+            int no = inf.playersCards[player-1][i].no;
+            switch(inf.playersCards[player-1][i].type)
+            {
+                case 1:
+                    {
+                        results[0]+=no;
+                        break;
+                    }
+                case 2:
+                    {
+                        results[1]+=no;
+                        break;
+                    }
+                case 3:
+                    {
+                        results[2]+=no;
+                        break;
+                    }
+                case 4:
+                    {
+                        results[3]+=no;
+                        break;
+                    }
+            }
+
+        }
+        int type=0;
+          int max = 0;
+        for(int i = 0; i < 4; i++)
+        {
+          
+
+            if (results[i] > max)
+            {
+                max = results[i];
+                type = i + 1;
+            }
+
+        }
+        return type;
+    }
+    public void setHokmName(int hokmnumber)
+    {
+        inf.hokm = CardsActions.getTypeName(hokmnumber);
+
+    }
+    public async Task SendAsync(string username, string key, List<string> content)
+    {
+        await inf._hubConnection.SendAsync("Broadcast", username, key, content);
+    }
+
+    public  async Task dist(int count, Match match)
+    {
+        string[] cardNames = { "02اسپیک", "03اسپیک", "04اسپیک", "05اسپیک", "06اسپیک", "07اسپیک", "08اسپیک", "09اسپیک", "10اسپیک", "11اسپیک", "12اسپیک", "13اسپیک", "14اسپیک",
+            "02دل", "03دل", "04دل","05دل","06دل","07دل","08دل","09دل","10دل","11دل","12دل","13دل","14دل" ,
+        "02گیشنیز", "03گیشنیز", "04گیشنیز", "05گیشنیز", "06گیشنیز", "07گیشنیز", "08گیشنیز", "09گیشنیز", "10گیشنیز", "11گیشنیز", "12گیشنیز", "13گیشنیز", "14گیشنیز",
+        "02خشت","03خشت","04خشت","05خشت","06خشت","07خشت","08خشت","09خشت","10خشت","11خشت","12خشت","13خشت","14خشت" };
+
+        int begin = 0;
+        if (count == 13)
+            begin = 5;
+
+        if (inf.swapCards.Count == 0)
+        {
+            inf.swapCards = new List<string>();
+            inf.swapCards.AddRange(cardNames);
+        }
+        for (int j = begin; j < count; j++)
+        {
+            for (  int i = 1; i < 5; i++)
+            {
+              
+
+                Random rand = new Random();
+                int index = rand.Next(inf.swapCards.Count);
+                Cardinstant card = new Cardinstant((string)inf.swapCards[index]);
+                inf.swapCards.RemoveAt(index);
+                Card c = new Card
+                    {
+                        cardNo = card.no,
+                        cardType = card.type,
+                        playerNo = i,
+                        MatcheIdFK=match.MatchId,
+                        Match = match
+
+                    };
+                await Service.addCard(c);
+
+            }
+        }
+
+    }
+    public async  Task modalHokmKon(int type)
+    {
+        inf.hokmnumber = type;
+        inf.Modaldisplay = "none";       
+        setHokmName(inf.hokmnumber);
+        if(inf.player == 1)
+        {
+            setHokmName(inf.hokmnumber);
+            inf.state="sendhokm";
+            await send();
+            inf.state="play";
+            await dist13();
+        }
+        if(inf.player== 2)
+        {
+            inf.state= "sendhokm2";
+            await send();
+            inf.state="play";
+            
+        }
+        //StateHasChanged();
+    }
+    public async Task dist13()
+    {
+        if (inf.swapCards.Count == 32)
+        {
+            await dist(13, inf.match);
+            GetCards();
+            StateHasChanged();
+        }
+    }
+}
